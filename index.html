@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Remaining Time Widget</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+background-color: #f0f0f0;
+}
+.widget {
+font-size: 24px;
+padding: 20px;
+border: 2px solid #000;
+background-color: #fff;
+border-radius: 8px;
+text-align: center;
+}
+select, button {
+font-size: 18px;
+padding: 5px 10px;
+margin-top: 10px;
+}
+</style>
+</head>
+<body>
+
+<div class="widget" id="widget">
+<div id="timeSelection">
+<p>Select the time you want to set the timer for:</p>
+<label for="hours">Hours: </label>
+<select id="hours">
+<option value="01">01</option>
+<option value="02">02</option>
+<option value="03">03</option>
+<option value="04">04</option>
+<option value="05">05</option>
+<option value="06">06</option>
+</select>
+<label for="minutes">Minutes: </label>
+<select id="minutes">
+<option value="00">00</option>
+<option value="15">15</option>
+<option value="30">30</option>
+<option value="45">45</option>
+</select>
+<br>
+<button onclick="startTimer()">Start Timer</button>
+</div>
+<div id="timeRemaining" style="display:none;">
+<p id="countdownText">Loading...</p>
+<button onclick="resetTimer()">Reset Timer</button>
+</div>
+</div>
+
+<script>
+let countdownInterval, selectedTime;
+
+function startTimer() {
+    const hours = document.getElementById('hours').value;
+    const minutes = document.getElementById('minutes').value;
+
+    selectedTime = `${hours}:${minutes}`;
+
+    const now = new Date();
+    let target = new Date(now);
+
+    target.setHours(hours);
+    target.setMinutes(minutes);
+    target.setSeconds(0);
+
+    // If the target time is before the current time, set the timer for the next day.
+    if (now > target) {
+        target.setDate(now.getDate() + 1);
+    }
+
+    document.getElementById('timeSelection').style.display = 'none';
+    document.getElementById('timeRemaining').style.display = 'block';
+
+    updateRemainingTime(target);
+
+    countdownInterval = setInterval(() => {
+        const diff = target - new Date();
+        if (diff <= 0) {
+            clearInterval(countdownInterval);
+            alert("Time's up!");
+            resetTimer();
+        } else {
+            updateRemainingTime(target);
+        }
+    }, 1000);
+}
+
+function updateRemainingTime(target) {
+    const now = new Date();
+    const diff = target - now;
+
+    const h = Math.floor(diff / (1000 * 60 * 60));
+    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+    document.getElementById('countdownText').textContent = `Time Left for ${selectedTime}: ${h}h ${m}m ${s}s`;
+}
+
+function resetTimer() {
+    clearInterval(countdownInterval);
+    document.getElementById('timeSelection').style.display = 'block';
+    document.getElementById('timeRemaining').style.display = 'none';
+}
+
+</script>
+
+</body>
+</html>
